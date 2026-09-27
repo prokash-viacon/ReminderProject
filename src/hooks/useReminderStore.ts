@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import { strings } from '../constants/strings';
 import type { Reminder, ReminderInput } from '../types/reminder';
 import { loadReminders, saveReminders } from '../storage/reminderStorage';
 import {
   cancelReminder,
+  ensureChannel,
   getPermissionStatus,
   reconcileNotifications,
+  requestPermission,
   rescheduleReminder,
   scheduleReminder,
   type PermissionStatus,
@@ -49,6 +52,8 @@ export function useReminderStore(): ReminderStore {
   const [scheduleError, setScheduleError] = useState<string | null>(null);
   const [permissionStatus, setPermissionStatus] =
     useState<PermissionStatus>('unknown');
+  const lastPermission = useRef<PermissionStatus>('unknown');
+  const initialRequestDone = useRef(false);
 
   const persist = useCallback(async (next: Reminder[]) => {
     const sorted = sortByDatetime(next);
@@ -57,33 +62,66 @@ export function useReminderStore(): ReminderStore {
     return sorted;
   }, []);
 
-  const refreshPermissionStatus = useCallback(async () => {
-    try {
-      const status = await getPermissionStatus();
+  const syncPermission = useCallback(
+    async (read: () => Promise<PermissionStatus>) => {
+      let status: PermissionStatus;
+      try {
+        status = await read();
+      } catch {
+        status = 'unknown';
+      }
+      const becameGranted =
+        status === 'granted' && lastPermission.current !== 'granted';
+      lastPermission.current = status;
       setPermissionStatus(status);
-    } catch {
-      setPermissionStatus('unknown');
-    }
-  }, []);
+
+      if (becameGranted) {
+        try {
+          await ensureChannel();
+          await reconcileNotifications(await loadReminders());
+        } catch {
+          // Reminders stay persisted; reconcile runs again on next grant
+        }
+      }
+    },
+    [],
+  );
+
+  const refreshPermissionStatus = useCallback(
+    () => syncPermission(getPermissionStatus),
+    [syncPermission],
+  );
 
   const reload = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const loaded = sortByDatetime(await loadReminders());
-      setReminders(loaded);
-      await refreshPermissionStatus();
-      await reconcileNotifications(loaded);
+      setReminders(sortByDatetime(await loadReminders()));
     } catch (e) {
       setError(e instanceof Error ? e.message : strings.errors.loadFailed);
     } finally {
       setLoading(false);
     }
-  }, [refreshPermissionStatus]);
+  }, []);
 
   useEffect(() => {
     reload();
-  }, [reload]);
+    syncPermission(requestPermission).finally(() => {
+      initialRequestDone.current = true;
+    });
+  }, [reload, syncPermission]);
+
+  // Picks up changes made in system Settings while the app was backgrounded.
+  // Skipped until the launch prompt resolves, since Android reports
+  // "denied" before the user has been asked.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active' && initialRequestDone.current) {
+        refreshPermissionStatus();
+      }
+    });
+    return () => subscription.remove();
+  }, [refreshPermissionStatus]);
 
   const createReminder = useCallback(
     async (input: ReminderInput) => {

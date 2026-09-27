@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Platform } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 import type { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { strings } from '../constants/strings';
 import type { Reminder } from '../types/reminder';
@@ -71,7 +71,10 @@ export function useTaskForm({ visible, reminder, onSave, onSaved }: Options) {
     setPickerMode(null);
   }, [visible, reminder]);
 
-  const openPicker = (mode: PickerMode) => setPickerMode(mode);
+  const openPicker = (mode: PickerMode) => {
+    Keyboard.dismiss();
+    setPickerMode(mode);
+  };
   const closePicker = () => setPickerMode(null);
 
   const onPickerChange = (event: DateTimePickerEvent, selected?: Date) => {

@@ -51,12 +51,17 @@ export const strings = {
   banners: {
     retry: 'Retry',
     dismiss: 'Dismiss',
-    permissionOff:
-      'Notifications are off. Reminders are saved, but you won’t get alerts until permission is enabled.',
-    openSettings: 'Open Settings',
     notificationsDisabled: 'Reminder saved, but notifications are disabled.',
     scheduleFailed: (reason: string) =>
       `Reminder saved, but couldn’t schedule notification: ${reason}`,
+  },
+
+  permission: {
+    title: 'Notifications are off',
+    message:
+      'Reminders needs notification access to alert you when a task is due. Turn on notifications in Settings to continue.',
+    hint: 'Come back here after enabling notifications.',
+    openSettings: 'Open Settings',
   },
 
   errors: {
@@ -78,5 +83,6 @@ export const strings = {
     add: '+',
     calendar: '📅',
     dropdown: '▼',
+    notificationsOff: '🔕',
   },
 } as const;

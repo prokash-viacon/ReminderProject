@@ -6,7 +6,7 @@ import notifee, {
   TriggerType,
   type Event,
 } from '@notifee/react-native';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { strings } from '../constants/strings';
 import type { Reminder } from '../types/reminder';
 import { emitNotificationOpen } from './notificationOpenBridge';
@@ -37,6 +37,14 @@ export async function requestPermission(): Promise<PermissionStatus> {
   return mapAuthorizationStatus(settings.authorizationStatus);
 }
 
+export async function openNotificationSettings(): Promise<void> {
+  if (Platform.OS === 'android') {
+    await notifee.openNotificationSettings();
+    return;
+  }
+  await Linking.openSettings();
+}
+
 export async function ensureChannel(): Promise<void> {
   if (Platform.OS !== 'android') {
     return;
@@ -60,7 +68,7 @@ export async function scheduleReminder(reminder: Reminder): Promise<void> {
     throw new Error(strings.errors.timeNotInFuture);
   }
 
-  const permission = await requestPermission();
+  const permission = await getPermissionStatus();
   if (permission !== 'granted') {
     throw new Error(strings.errors.permissionNotGranted);
   }

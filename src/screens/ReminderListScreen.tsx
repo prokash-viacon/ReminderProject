@@ -12,7 +12,6 @@ import { strings } from '../constants/strings';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { LoadingState } from '../components/LoadingState';
-import { PermissionBanner } from '../components/PermissionBanner';
 import { ReminderRow } from '../components/ReminderRow';
 import { TaskFormSheet } from '../components/TaskFormSheet';
 import { useReminderList } from '../hooks';
@@ -26,7 +25,6 @@ export function ReminderListScreen() {
     loading,
     error,
     reload,
-    permissionDenied,
     scheduleErrorMessage,
     clearScheduleError,
     query,
@@ -101,11 +99,10 @@ export function ReminderListScreen() {
         <Text
           style={[typography.icon, styles.filterIcon, { color: colors.text }]}
         >
-          {strings.icons.filter}
+          
         </Text>
       </View>
 
-      <PermissionBanner colors={colors} visible={permissionDenied} />
       {error ? (
         <ErrorBanner
           colors={colors}
@@ -218,6 +215,7 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 8,
+    fontSize: 30,
   },
   searchInput: {
     flex: 1,

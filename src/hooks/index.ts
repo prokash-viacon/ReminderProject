@@ -6,3 +6,4 @@ export {
   type TaskFormValues,
 } from './useTaskForm';
 export { useSheetAnimation } from './useSheetAnimation';
+export { useNotificationPermissionGate } from './useNotificationPermissionGate';

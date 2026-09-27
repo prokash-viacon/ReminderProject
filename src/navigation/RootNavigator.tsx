@@ -7,6 +7,7 @@ import {
   type NavigationContainerRef,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NotificationPermissionModal } from '../components/NotificationPermissionModal';
 import { ReminderListScreen } from '../screens/ReminderListScreen';
 import {
   consumeInitialNotification,
@@ -46,6 +47,7 @@ export function RootNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="ReminderList" component={ReminderListScreen} />
       </Stack.Navigator>
+      <NotificationPermissionModal />
     </NavigationContainer>
   );
 }

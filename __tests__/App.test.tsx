@@ -40,6 +40,7 @@ jest.mock('@notifee/react-native', () => ({
     onForegroundEvent: jest.fn(() => jest.fn()),
     onBackgroundEvent: jest.fn(),
     getInitialNotification: jest.fn(async () => null),
+    openNotificationSettings: jest.fn(async () => undefined),
   },
   AndroidImportance: { HIGH: 4 },
   AuthorizationStatus: {
@@ -59,16 +60,33 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   clear: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('react-native-screens', () => ({
-  enableScreens: jest.fn(),
-  Screen: require('react-native').View,
-  ScreenContainer: require('react-native').View,
-}));
+jest.mock('react-native-safe-area-context', () =>
+  require('react-native-safe-area-context/jest/mock').default,
+);
 
+import notifee from '@notifee/react-native';
 import App from '../App';
+import { strings } from '../src/constants/strings';
+
+function hasText(root: ReactTestRenderer.ReactTestInstance, text: string) {
+  return root.findAll(node => node.props.children === text).length > 0;
+}
 
 test('renders correctly', async () => {
+  let renderer!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(async () => {
-    ReactTestRenderer.create(<App />);
+    renderer = ReactTestRenderer.create(<App />);
   });
+  expect(hasText(renderer.root, strings.permission.title)).toBe(false);
+});
+
+test('blocks the app when notification permission is denied', async () => {
+  (notifee.requestPermission as jest.Mock).mockResolvedValueOnce({
+    authorizationStatus: 0,
+  });
+  let renderer!: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(async () => {
+    renderer = ReactTestRenderer.create(<App />);
+  });
+  expect(hasText(renderer.root, strings.permission.title)).toBe(true);
 });
