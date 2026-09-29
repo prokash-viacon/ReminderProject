@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, Text, View } from 'react-native';
 import { strings } from '../constants/strings';
 import { useNotificationPermissionGate } from '../hooks';
 import { typography } from '../theme/typography';
+import { AppButton } from './ui';
 
 export function NotificationPermissionModal() {
   const { colors, blocked, openSettings } = useNotificationPermissionGate();
@@ -45,14 +46,12 @@ export function NotificationPermissionModal() {
           >
             {strings.permission.message}
           </Text>
-          <Pressable
+          <AppButton
+            colors={colors}
+            title={strings.permission.openSettings}
             onPress={openSettings}
-            style={[styles.button, { backgroundColor: colors.primary }]}
-          >
-            <Text style={[typography.button, { color: colors.primaryContrast }]}>
-              {strings.permission.openSettings}
-            </Text>
-          </Pressable>
+            style={styles.button}
+          />
           <Text
             style={[
               typography.caption,
@@ -101,9 +100,6 @@ const styles = StyleSheet.create({
   },
   button: {
     alignSelf: 'stretch',
-    borderRadius: 28,
-    paddingVertical: 16,
-    alignItems: 'center',
     marginTop: 6,
   },
 });

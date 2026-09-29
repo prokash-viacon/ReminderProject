@@ -1,8 +1,9 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { strings } from '../constants/strings';
 import type { AppColors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { AppButton } from './ui';
 
 type Props = {
   colors: AppColors;
@@ -26,18 +27,22 @@ export function ErrorBanner({
       </Text>
       <View style={styles.actions}>
         {onAction && actionLabel ? (
-          <Pressable onPress={onAction} hitSlop={8}>
-            <Text style={[typography.smallStrong, { color: colors.errorText }]}>
-              {actionLabel}
-            </Text>
-          </Pressable>
+          <AppButton
+            colors={colors}
+            variant="link"
+            title={actionLabel}
+            onPress={onAction}
+            color={colors.errorText}
+          />
         ) : null}
         {onDismiss ? (
-          <Pressable onPress={onDismiss} hitSlop={8}>
-            <Text style={[typography.smallStrong, { color: colors.errorText }]}>
-              {strings.banners.dismiss}
-            </Text>
-          </Pressable>
+          <AppButton
+            colors={colors}
+            variant="link"
+            title={strings.banners.dismiss}
+            onPress={onDismiss}
+            color={colors.errorText}
+          />
         ) : null}
       </View>
     </View>

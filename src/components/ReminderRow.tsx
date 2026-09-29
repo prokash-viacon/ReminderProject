@@ -77,7 +77,15 @@ export function ReminderRow({
       }).start();
     });
 
-  const editOpacity = translateX.interpolate({
+  const handleCardPress = () => {
+    if (openOffset.current !== 0) {
+      close();
+      return;
+    }
+    onEdit();
+  };
+
+  const completeOpacity = translateX.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 1],
     extrapolate: 'clamp',
@@ -94,19 +102,19 @@ export function ReminderRow({
         pointerEvents="box-none"
         style={[
           styles.actionLayer,
-          styles.editLayer,
-          { backgroundColor: colors.editAction, opacity: editOpacity },
+          styles.completeLayer,
+          { backgroundColor: colors.success, opacity: completeOpacity },
         ]}
       >
         <Pressable
           style={styles.action}
           onPress={() => {
             close();
-            onEdit();
+            onToggleComplete();
           }}
         >
           <Text style={[typography.swipeAction, styles.actionText]}>
-            {strings.row.edit}
+            {reminder.completed ? strings.row.undo : strings.row.done}
           </Text>
         </Pressable>
       </Animated.View>
@@ -144,7 +152,7 @@ export function ReminderRow({
           ]}
         >
           <Pressable
-            onPress={onToggleComplete}
+            onPress={handleCardPress}
             style={styles.cardPress}
             accessibilityRole="button"
           >
@@ -192,7 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
   },
-  editLayer: {
+  completeLayer: {
     justifyContent: 'flex-start',
   },
   deleteLayer: {

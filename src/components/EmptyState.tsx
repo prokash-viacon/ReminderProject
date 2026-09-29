@@ -1,8 +1,9 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { strings } from '../constants/strings';
 import type { AppColors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { AppButton } from './ui';
 
 type Props = {
   colors: AppColors;
@@ -40,14 +41,13 @@ export function EmptyState({
         {subtitle}
       </Text>
       {onAction ? (
-        <Pressable
+        <AppButton
+          colors={colors}
+          size="sm"
+          title={actionLabel}
           onPress={onAction}
-          style={[styles.button, { backgroundColor: colors.primary }]}
-        >
-          <Text style={[typography.buttonSmall, styles.buttonText]}>
-            {actionLabel}
-          </Text>
-        </Pressable>
+          style={styles.button}
+        />
       ) : null}
     </View>
   );
@@ -66,11 +66,5 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
-  buttonText: {
-    color: '#FFFFFF',
   },
 });

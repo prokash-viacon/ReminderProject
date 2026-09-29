@@ -20,7 +20,8 @@ export const strings = {
   },
 
   row: {
-    edit: 'Edit',
+    done: 'Done',
+    undo: 'Undo',
     delete: 'Delete',
     duePrefix: 'Due: ',
     completedSuffix: ' · Done',

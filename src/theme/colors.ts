@@ -3,6 +3,7 @@ export type AppColors = {
   surface: string;
   searchBg: string;
   inputBg: string;
+  inputText: string;
   text: string;
   textSecondary: string;
   placeholder: string;
@@ -10,7 +11,6 @@ export type AppColors = {
   primary: string;
   primaryContrast: string;
   danger: string;
-  editAction: string;
   success: string;
   bannerBg: string;
   bannerText: string;
@@ -26,6 +26,7 @@ export const lightColors: AppColors = {
   surface: '#FFFFFF',
   searchBg: '#FFFFFF',
   inputBg: '#FFFFFF',
+  inputText: '#26110D',
   text: '#26110D',
   textSecondary: '#5C4033',
   placeholder: '#A69B8F',
@@ -33,7 +34,6 @@ export const lightColors: AppColors = {
   primary: '#FF5722',
   primaryContrast: '#FFFFFF',
   danger: '#C62828',
-  editAction: '#5D4037',
   success: '#2E7D32',
   bannerBg: '#FFF4E5',
   bannerText: '#8A5A00',
@@ -49,6 +49,7 @@ export const darkColors: AppColors = {
   surface: '#222222',
   searchBg: '#1A1814',
   inputBg: '#F2F2F2',
+  inputText: '#1A1814',
   text: '#FFFFFF',
   textSecondary: '#B0A99F',
   placeholder: '#8A8580',
@@ -56,7 +57,6 @@ export const darkColors: AppColors = {
   primary: '#FF5722',
   primaryContrast: '#FFFFFF',
   danger: '#E53935',
-  editAction: '#8D6E63',
   success: '#66BB6A',
   bannerBg: '#3A2E14',
   bannerText: '#FFD60A',

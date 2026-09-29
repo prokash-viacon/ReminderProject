@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { strings } from '../constants/strings';
 import { EmptyState } from '../components/EmptyState';
@@ -14,6 +7,7 @@ import { ErrorBanner } from '../components/ErrorBanner';
 import { LoadingState } from '../components/LoadingState';
 import { ReminderRow } from '../components/ReminderRow';
 import { TaskFormSheet } from '../components/TaskFormSheet';
+import { AppTextInput } from '../components/ui';
 import { useReminderList } from '../hooks';
 import { typography } from '../theme/typography';
 
@@ -70,38 +64,15 @@ export function ReminderListScreen() {
         </Text>
       </View>
 
-      <View
-        style={[
-          styles.searchBar,
-          { backgroundColor: colors.searchBg, shadowColor: colors.shadow },
-        ]}
-      >
-        <Text
-          style={[
-            typography.icon,
-            styles.searchIcon,
-            { color: colors.placeholder },
-          ]}
-        >
-          {strings.icons.search}
-        </Text>
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder={strings.list.searchPlaceholder}
-          placeholderTextColor={colors.placeholder}
-          style={[
-            typography.searchInput,
-            styles.searchInput,
-            { color: colors.text },
-          ]}
-        />
-        <Text
-          style={[typography.icon, styles.filterIcon, { color: colors.text }]}
-        >
-          
-        </Text>
-      </View>
+      <AppTextInput
+        colors={colors}
+        variant="search"
+        leftIcon={strings.icons.search}
+        value={query}
+        onChangeText={setQuery}
+        placeholder={strings.list.searchPlaceholder}
+        containerStyle={styles.searchBar}
+      />
 
       {error ? (
         <ErrorBanner
@@ -203,26 +174,6 @@ const styles = StyleSheet.create({
   searchBar: {
     marginHorizontal: 20,
     marginBottom: 14,
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  searchIcon: {
-    marginRight: 8,
-    fontSize: 30,
-  },
-  searchInput: {
-    flex: 1,
-    padding: 0,
-  },
-  filterIcon: {
-    marginLeft: 8,
   },
   listContent: {
     paddingTop: 4,

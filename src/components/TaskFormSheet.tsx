@@ -9,7 +9,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -19,6 +18,7 @@ import { useSheetAnimation, useTaskForm, type TaskFormValues } from '../hooks';
 import type { Reminder } from '../types/reminder';
 import type { AppColors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { AppButton, AppTextInput, PickerField } from './ui';
 
 type Props = {
   visible: boolean;
@@ -47,8 +47,6 @@ export function TaskFormSheet({
     onSave,
     onSaved: sheet.close,
   });
-
-  const inputTextColor = isDark ? '#1A1814' : colors.text;
 
   return (
     <Modal
@@ -106,117 +104,43 @@ export function TaskFormSheet({
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.formContent}
             >
-              <Text
-                style={[typography.label, styles.label, { color: colors.text }]}
-              >
-                {strings.form.titleLabel}
-              </Text>
-              <TextInput
+              <AppTextInput
+                colors={colors}
+                label={strings.form.titleLabel}
                 value={form.title}
                 onChangeText={form.setTitle}
                 placeholder={strings.form.titlePlaceholder}
-                placeholderTextColor={colors.placeholder}
-                style={[
-                  typography.input,
-                  styles.input,
-                  {
-                    backgroundColor: colors.inputBg,
-                    color: inputTextColor,
-                    shadowColor: colors.shadow,
-                  },
-                ]}
               />
 
-              <Text
-                style={[typography.label, styles.label, { color: colors.text }]}
-              >
-                {strings.form.dateLabel}
-              </Text>
-              <Pressable
+              <PickerField
+                colors={colors}
+                label={strings.form.dateLabel}
+                value={form.dateLabel}
+                isPlaceholder={!form.dateSet}
+                icon={strings.icons.calendar}
                 onPress={() => form.openPicker('date')}
-                style={[
-                  styles.input,
-                  styles.rowInput,
-                  {
-                    backgroundColor: colors.inputBg,
-                    shadowColor: colors.shadow,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    typography.input,
-                    styles.fieldValue,
-                    {
-                      color: form.dateSet ? inputTextColor : colors.placeholder,
-                    },
-                  ]}
-                >
-                  {form.dateLabel}
-                </Text>
-                <Text
-                  style={[
-                    typography.iconSmall,
-                    styles.fieldIcon,
-                    { color: inputTextColor },
-                  ]}
-                >
-                  {strings.icons.calendar}
-                </Text>
-              </Pressable>
+              />
 
-              <Text
-                style={[typography.label, styles.label, { color: colors.text }]}
-              >
-                {strings.form.timeLabel}
-              </Text>
-              <Pressable
+              <PickerField
+                colors={colors}
+                label={strings.form.timeLabel}
+                value={form.timeLabel}
+                isPlaceholder={!form.timeSet}
+                icon={strings.icons.dropdown}
                 onPress={() => form.openPicker('time')}
-                style={[
-                  styles.input,
-                  styles.rowInput,
-                  {
-                    backgroundColor: colors.inputBg,
-                    shadowColor: colors.shadow,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    typography.input,
-                    styles.fieldValue,
-                    {
-                      color: form.timeSet ? inputTextColor : colors.placeholder,
-                    },
-                  ]}
-                >
-                  {form.timeLabel}
-                </Text>
-                <Text
-                  style={[
-                    typography.iconSmall,
-                    styles.fieldIcon,
-                    { color: inputTextColor },
-                  ]}
-                >
-                  {strings.icons.dropdown}
-                </Text>
-              </Pressable>
+              />
 
               {form.pickerMode &&
               (Platform.OS === 'ios' || Platform.OS === 'android') ? (
                 <View style={styles.pickerWrap}>
                   {Platform.OS === 'ios' ? (
-                    <Pressable
+                    <AppButton
+                      colors={colors}
+                      variant="link"
+                      title={strings.form.done}
                       onPress={form.closePicker}
-                      style={styles.doneRow}
-                    >
-                      <Text
-                        style={[typography.link, { color: colors.primary }]}
-                      >
-                        {strings.form.done}
-                      </Text>
-                    </Pressable>
+                      style={styles.doneButton}
+                    />
                   ) : null}
                   <DateTimePicker
                     value={form.datetime}
@@ -245,31 +169,20 @@ export function TaskFormSheet({
             </ScrollView>
 
             <View style={styles.actions}>
-              <Pressable
+              <AppButton
+                colors={colors}
+                title={form.saving ? strings.form.saving : strings.form.save}
                 onPress={form.handleSave}
                 disabled={form.saving}
-                style={[
-                  styles.actionBtn,
-                  { backgroundColor: colors.primary },
-                  form.saving && styles.disabled,
-                ]}
-              >
-                <Text style={[typography.button, styles.saveText]}>
-                  {form.saving ? strings.form.saving : strings.form.save}
-                </Text>
-              </Pressable>
-              <Pressable
+                style={styles.actionButton}
+              />
+              <AppButton
+                colors={colors}
+                variant="outline"
+                title={strings.form.clear}
                 onPress={form.clearForm}
-                style={[
-                  styles.actionBtn,
-                  styles.clearBtn,
-                  { borderColor: colors.primary },
-                ]}
-              >
-                <Text style={[typography.button, { color: colors.primary }]}>
-                  {strings.form.clear}
-                </Text>
-              </Pressable>
+                style={styles.actionButton}
+              />
             </View>
           </Animated.View>
         </KeyboardAvoidingView>
@@ -315,36 +228,12 @@ const styles = StyleSheet.create({
   },
   formContent: {
     paddingBottom: 12,
-    gap: 0,
-  },
-  label: {
-    marginBottom: 8,
-    marginTop: 12,
-  },
-  input: {
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  rowInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  fieldValue: {
-    flex: 1,
-  },
-  fieldIcon: {
-    marginLeft: 8,
   },
   pickerWrap: {
     marginTop: 8,
   },
-  doneRow: {
-    alignItems: 'flex-end',
+  doneButton: {
+    alignSelf: 'flex-end',
     paddingVertical: 6,
   },
   error: {
@@ -355,21 +244,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingTop: 8,
   },
-  actionBtn: {
+  actionButton: {
     flex: 1,
-    borderRadius: 28,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  clearBtn: {
-    borderWidth: 2,
-    backgroundColor: '#FFFFFF',
-  },
-  saveText: {
-    color: '#FFFFFF',
-  },
-  disabled: {
-    opacity: 0.65,
   },
 });

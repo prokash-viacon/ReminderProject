@@ -68,6 +68,9 @@ export const typography = StyleSheet.create({
   icon: {
     fontSize: 18,
   },
+  searchIcon: {
+    fontSize: 30,
+  },
   fabIcon: {
     fontSize: 36,
     fontWeight: '400',
