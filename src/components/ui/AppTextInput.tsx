@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -23,7 +23,7 @@ type Props = TextInputProps & {
   containerStyle?: StyleProp<ViewStyle>;
 };
 
-export function AppTextInput({
+function AppTextInputComponent({
   colors,
   label,
   leftIcon,
@@ -91,6 +91,8 @@ export function AppTextInput({
     </View>
   );
 }
+
+export const AppTextInput = memo(AppTextInputComponent);
 
 const styles = StyleSheet.create({
   searchBox: {

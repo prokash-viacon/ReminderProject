@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 
 export function useSheetAnimation(
@@ -30,7 +30,7 @@ export function useSheetAnimation(
     }
   }, [visible, height, backdrop, translateY]);
 
-  const close = () => {
+  const close = useCallback(() => {
     Animated.parallel([
       Animated.timing(backdrop, {
         toValue: 0,
@@ -47,7 +47,7 @@ export function useSheetAnimation(
         onClosed();
       }
     });
-  };
+  }, [backdrop, translateY, height, onClosed]);
 
   return { translateY, backdrop, close };
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Keyboard, Platform } from 'react-native';
 import type { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { strings } from '../constants/strings';
@@ -71,50 +71,55 @@ export function useTaskForm({ visible, reminder, onSave, onSaved }: Options) {
     setPickerMode(null);
   }, [visible, reminder]);
 
-  const openPicker = (mode: PickerMode) => {
+  const openPicker = useCallback((mode: PickerMode) => {
     Keyboard.dismiss();
     setPickerMode(mode);
-  };
-  const closePicker = () => setPickerMode(null);
+  }, []);
+  const openDatePicker = useCallback(() => openPicker('date'), [openPicker]);
+  const openTimePicker = useCallback(() => openPicker('time'), [openPicker]);
+  const closePicker = useCallback(() => setPickerMode(null), []);
 
-  const onPickerChange = (event: DateTimePickerEvent, selected?: Date) => {
-    if (Platform.OS === 'android') {
-      setPickerMode(null);
-      if (event.type === 'dismissed') {
+  const onPickerChange = useCallback(
+    (event: DateTimePickerEvent, selected?: Date) => {
+      if (Platform.OS === 'android') {
+        setPickerMode(null);
+        if (event.type === 'dismissed') {
+          return;
+        }
+      }
+      if (!selected) {
         return;
       }
-    }
-    if (!selected) {
-      return;
-    }
 
-    setDatetime(prev => {
-      const next = new Date(prev);
-      if (pickerMode === 'date') {
-        next.setFullYear(
-          selected.getFullYear(),
-          selected.getMonth(),
-          selected.getDate(),
-        );
-        setDateSet(true);
-      } else if (pickerMode === 'time') {
-        next.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
-        setTimeSet(true);
-      }
-      return next;
-    });
-  };
+      setDatetime(prev => {
+        const next = new Date(prev);
+        if (pickerMode === 'date') {
+          next.setFullYear(
+            selected.getFullYear(),
+            selected.getMonth(),
+            selected.getDate(),
+          );
+          setDateSet(true);
+        } else if (pickerMode === 'time') {
+          next.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
+          setTimeSet(true);
+        }
+        return next;
+      });
+    },
+    [pickerMode],
+  );
 
-  const clearForm = () => {
+  const clearForm = useCallback(() => {
     setTitle('');
     setDatetime(defaultFutureDate());
     setDateSet(false);
     setTimeSet(false);
     setValidationError(null);
     setPickerMode(null);
-  };
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     const trimmed = title.trim();
     if (!trimmed) {
       setValidationError(strings.validation.titleRequired);
@@ -141,7 +146,7 @@ export function useTaskForm({ visible, reminder, onSave, onSaved }: Options) {
     } finally {
       setSaving(false);
     }
-  };
+  }, [title, dateSet, timeSet, datetime, onSave, onSaved]);
 
   const dateLabel = useMemo(
     () => (dateSet ? formatDateLabel(datetime) : strings.form.datePlaceholder),
@@ -162,7 +167,8 @@ export function useTaskForm({ visible, reminder, onSave, onSaved }: Options) {
     dateLabel,
     timeLabel,
     pickerMode,
-    openPicker,
+    openDatePicker,
+    openTimePicker,
     closePicker,
     onPickerChange,
     validationError,

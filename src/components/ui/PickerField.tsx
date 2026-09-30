@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Pressable, Text } from 'react-native';
 import type { AppColors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
@@ -14,7 +14,7 @@ type Props = {
   onPress: () => void;
 };
 
-export function PickerField({
+function PickerFieldComponent({
   colors,
   label,
   value,
@@ -64,3 +64,5 @@ export function PickerField({
     </>
   );
 }
+
+export const PickerField = memo(PickerFieldComponent);

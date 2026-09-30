@@ -1,5 +1,12 @@
-import React from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { memo, useCallback, useMemo } from 'react';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type ListRenderItem,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { strings } from '../constants/strings';
 import { EmptyState } from '../components/EmptyState';
@@ -10,8 +17,11 @@ import { TaskFormSheet } from '../components/TaskFormSheet';
 import { AppTextInput } from '../components/ui';
 import { useReminderList } from '../hooks';
 import { typography } from '../theme/typography';
+import type { Reminder } from '../types/reminder';
 
-export function ReminderListScreen() {
+const keyExtractor = (item: Reminder) => item.id;
+
+function ReminderListScreenComponent() {
   const insets = useSafeAreaInsets();
   const {
     isDark,
@@ -34,6 +44,24 @@ export function ReminderListScreen() {
     closeSheet,
     saveTask,
   } = useReminderList();
+
+  const renderItem = useCallback<ListRenderItem<Reminder>>(
+    ({ item }) => (
+      <ReminderRow
+        reminder={item}
+        colors={colors}
+        onEdit={openEdit}
+        onDelete={removeReminder}
+        onToggleComplete={toggleComplete}
+      />
+    ),
+    [colors, openEdit, removeReminder, toggleComplete],
+  );
+
+  const listContentStyle = useMemo(
+    () => [styles.listContent, { paddingBottom: insets.bottom + 100 }],
+    [insets.bottom],
+  );
 
   if (loading) {
     return (
@@ -107,20 +135,9 @@ export function ReminderListScreen() {
       ) : (
         <FlatList
           data={filteredReminders}
-          keyExtractor={item => item.id}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingBottom: insets.bottom + 100 },
-          ]}
-          renderItem={({ item }) => (
-            <ReminderRow
-              reminder={item}
-              colors={colors}
-              onEdit={() => openEdit(item)}
-              onDelete={() => removeReminder(item.id)}
-              onToggleComplete={() => toggleComplete(item.id)}
-            />
-          )}
+          keyExtractor={keyExtractor}
+          contentContainerStyle={listContentStyle}
+          renderItem={renderItem}
         />
       )}
 
@@ -158,6 +175,8 @@ export function ReminderListScreen() {
     </View>
   );
 }
+
+export const ReminderListScreen = memo(ReminderListScreenComponent);
 
 const styles = StyleSheet.create({
   flex: {

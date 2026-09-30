@@ -54,9 +54,13 @@ export function useReminderStore(): ReminderStore {
     useState<PermissionStatus>('unknown');
   const lastPermission = useRef<PermissionStatus>('unknown');
   const initialRequestDone = useRef(false);
+  // Mirrors `reminders` so the CRUD callbacks can stay referentially stable
+  // (memoized rows would otherwise re-render on every list change).
+  const remindersRef = useRef<Reminder[]>([]);
 
   const persist = useCallback(async (next: Reminder[]) => {
     const sorted = sortByDatetime(next);
+    remindersRef.current = sorted;
     setReminders(sorted);
     await saveReminders(sorted);
     return sorted;
@@ -96,7 +100,9 @@ export function useReminderStore(): ReminderStore {
     setLoading(true);
     setError(null);
     try {
-      setReminders(sortByDatetime(await loadReminders()));
+      const loaded = sortByDatetime(await loadReminders());
+      remindersRef.current = loaded;
+      setReminders(loaded);
     } catch (e) {
       setError(e instanceof Error ? e.message : strings.errors.loadFailed);
     } finally {
@@ -135,7 +141,7 @@ export function useReminderStore(): ReminderStore {
         updatedAt: now,
       };
 
-      await persist([...reminders, reminder]);
+      await persist([...remindersRef.current, reminder]);
 
       try {
         await scheduleReminder(reminder);
@@ -150,12 +156,12 @@ export function useReminderStore(): ReminderStore {
 
       return reminder;
     },
-    [persist, reminders, refreshPermissionStatus],
+    [persist, refreshPermissionStatus],
   );
 
   const updateReminder = useCallback(
     async (id: string, input: ReminderInput) => {
-      const existing = reminders.find(r => r.id === id);
+      const existing = remindersRef.current.find(r => r.id === id);
       if (!existing) {
         throw new Error(strings.errors.reminderNotFound);
       }
@@ -168,7 +174,7 @@ export function useReminderStore(): ReminderStore {
         updatedAt: new Date().toISOString(),
       };
 
-      await persist(reminders.map(r => (r.id === id ? updated : r)));
+      await persist(remindersRef.current.map(r => (r.id === id ? updated : r)));
 
       try {
         if (updated.completed) {
@@ -187,24 +193,24 @@ export function useReminderStore(): ReminderStore {
 
       return updated;
     },
-    [persist, reminders, refreshPermissionStatus],
+    [persist, refreshPermissionStatus],
   );
 
   const removeReminder = useCallback(
     async (id: string) => {
-      await persist(reminders.filter(r => r.id !== id));
+      await persist(remindersRef.current.filter(r => r.id !== id));
       try {
         await cancelReminder(id);
       } catch {
         // Reminder already removed from storage
       }
     },
-    [persist, reminders],
+    [persist],
   );
 
   const toggleComplete = useCallback(
     async (id: string) => {
-      const existing = reminders.find(r => r.id === id);
+      const existing = remindersRef.current.find(r => r.id === id);
       if (!existing) {
         return;
       }
@@ -215,7 +221,7 @@ export function useReminderStore(): ReminderStore {
         updatedAt: new Date().toISOString(),
       };
 
-      await persist(reminders.map(r => (r.id === id ? updated : r)));
+      await persist(remindersRef.current.map(r => (r.id === id ? updated : r)));
 
       try {
         if (updated.completed) {
@@ -233,12 +239,12 @@ export function useReminderStore(): ReminderStore {
         await refreshPermissionStatus();
       }
     },
-    [persist, reminders, refreshPermissionStatus],
+    [persist, refreshPermissionStatus],
   );
 
   const getReminderById = useCallback(
-    (id: string) => reminders.find(r => r.id === id),
-    [reminders],
+    (id: string) => remindersRef.current.find(r => r.id === id),
+    [],
   );
 
   const clearScheduleError = useCallback(() => setScheduleError(null), []);

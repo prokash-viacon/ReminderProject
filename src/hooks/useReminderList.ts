@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { strings } from '../constants/strings';
 import { useReminders } from '../context/ReminderContext';
@@ -29,20 +29,20 @@ export function useReminderList() {
   const [editing, setEditing] = useState<Reminder | null>(null);
   const [pendingOpenId, setPendingOpenId] = useState<string | null>(null);
 
-  const openCreate = () => {
+  const openCreate = useCallback(() => {
     setEditing(null);
     setSheetVisible(true);
-  };
+  }, []);
 
-  const openEdit = (reminder: Reminder) => {
+  const openEdit = useCallback((reminder: Reminder) => {
     setEditing(reminder);
     setSheetVisible(true);
-  };
+  }, []);
 
-  const closeSheet = () => {
+  const closeSheet = useCallback(() => {
     setSheetVisible(false);
     setEditing(null);
-  };
+  }, []);
 
   useEffect(() => {
     setNotificationOpenListener(setPendingOpenId);
@@ -70,17 +70,20 @@ export function useReminderList() {
     return reminders.filter(r => r.title.toLowerCase().includes(q));
   }, [reminders, query]);
 
-  const saveTask = async (values: TaskFormValues) => {
-    if (editing) {
-      await updateReminder(editing.id, {
-        title: values.title,
-        datetime: values.datetime,
-        completed: editing.completed,
-      });
-    } else {
-      await createReminder(values);
-    }
-  };
+  const saveTask = useCallback(
+    async (values: TaskFormValues) => {
+      if (editing) {
+        await updateReminder(editing.id, {
+          title: values.title,
+          datetime: values.datetime,
+          completed: editing.completed,
+        });
+      } else {
+        await createReminder(values);
+      }
+    },
+    [editing, updateReminder, createReminder],
+  );
 
   let scheduleErrorMessage: string | null = null;
   if (scheduleError) {

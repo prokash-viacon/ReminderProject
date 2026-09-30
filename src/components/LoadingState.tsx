@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -16,7 +16,7 @@ type Props = {
   style?: ViewStyle;
 };
 
-export function LoadingState({
+function LoadingStateComponent({
   colors,
   message = strings.loading.reminders,
   style,
@@ -30,6 +30,8 @@ export function LoadingState({
     </View>
   );
 }
+
+export const LoadingState = memo(LoadingStateComponent);
 
 const styles = StyleSheet.create({
   container: {

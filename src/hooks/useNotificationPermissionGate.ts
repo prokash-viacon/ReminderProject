@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useColorScheme } from 'react-native';
 import { useReminders } from '../context/ReminderContext';
 import { openNotificationSettings } from '../services/notificationService';
@@ -8,9 +9,9 @@ export function useNotificationPermissionGate() {
   const colors = getColors(isDark);
   const { permissionStatus } = useReminders();
 
-  const openSettings = () => {
+  const openSettings = useCallback(() => {
     openNotificationSettings().catch(() => {});
-  };
+  }, []);
 
   return {
     colors,

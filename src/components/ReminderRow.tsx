@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { memo, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { strings } from '../constants/strings';
@@ -12,9 +12,9 @@ const OPEN_THRESHOLD = 44;
 type Props = {
   reminder: Reminder;
   colors: AppColors;
-  onEdit: () => void;
-  onDelete: () => void;
-  onToggleComplete: () => void;
+  onEdit: (reminder: Reminder) => void;
+  onDelete: (id: string) => void;
+  onToggleComplete: (id: string) => void;
 };
 
 function formatDue(iso: string): string {
@@ -31,7 +31,7 @@ function formatDue(iso: string): string {
   return `${weekday}, ${day} ${time}`;
 }
 
-export function ReminderRow({
+function ReminderRowComponent({
   reminder,
   colors,
   onEdit,
@@ -82,7 +82,7 @@ export function ReminderRow({
       close();
       return;
     }
-    onEdit();
+    onEdit(reminder);
   };
 
   const completeOpacity = translateX.interpolate({
@@ -110,7 +110,7 @@ export function ReminderRow({
           style={styles.action}
           onPress={() => {
             close();
-            onToggleComplete();
+            onToggleComplete(reminder.id);
           }}
         >
           <Text style={[typography.swipeAction, styles.actionText]}>
@@ -130,7 +130,7 @@ export function ReminderRow({
           style={styles.action}
           onPress={() => {
             close();
-            onDelete();
+            onDelete(reminder.id);
           }}
         >
           <Text style={[typography.swipeAction, styles.actionText]}>
@@ -143,11 +143,11 @@ export function ReminderRow({
         <Animated.View
           style={[
             styles.card,
+            reminder.completed && styles.completedCard,
             {
               backgroundColor: colors.surface,
               shadowColor: colors.shadow,
               transform: [{ translateX }],
-              opacity: reminder.completed ? 0.72 : 1,
             },
           ]}
         >
@@ -159,12 +159,8 @@ export function ReminderRow({
             <Text
               style={[
                 typography.cardTitle,
-                {
-                  color: colors.text,
-                  textDecorationLine: reminder.completed
-                    ? 'line-through'
-                    : 'none',
-                },
+                reminder.completed && styles.completedTitle,
+                { color: colors.text },
               ]}
               numberOfLines={2}
             >
@@ -183,6 +179,8 @@ export function ReminderRow({
     </View>
   );
 }
+
+export const ReminderRow = memo(ReminderRowComponent);
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -222,6 +220,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+  },
+  completedCard: {
+    opacity: 0.72,
+  },
+  completedTitle: {
+    textDecorationLine: 'line-through',
   },
   cardPress: {
     gap: 8,

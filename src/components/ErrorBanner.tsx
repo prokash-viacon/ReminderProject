@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { strings } from '../constants/strings';
 import type { AppColors } from '../theme/colors';
@@ -13,7 +13,7 @@ type Props = {
   onDismiss?: () => void;
 };
 
-export function ErrorBanner({
+function ErrorBannerComponent({
   colors,
   message,
   actionLabel,
@@ -48,6 +48,8 @@ export function ErrorBanner({
     </View>
   );
 }
+
+export const ErrorBanner = memo(ErrorBannerComponent);
 
 const styles = StyleSheet.create({
   container: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -27,7 +27,7 @@ type Props = {
   accessibilityLabel?: string;
 };
 
-export function AppButton({
+function AppButtonComponent({
   colors,
   title,
   onPress,
@@ -75,6 +75,8 @@ export function AppButton({
     </Pressable>
   );
 }
+
+export const AppButton = memo(AppButtonComponent);
 
 const styles = StyleSheet.create({
   base: {

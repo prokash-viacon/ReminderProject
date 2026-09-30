@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { strings } from '../constants/strings';
 import type { AppColors } from '../theme/colors';
@@ -13,7 +13,7 @@ type Props = {
   onAction?: () => void;
 };
 
-export function EmptyState({
+function EmptyStateComponent({
   colors,
   title = strings.emptyState.title,
   subtitle = strings.emptyState.subtitle,
@@ -52,6 +52,8 @@ export function EmptyState({
     </View>
   );
 }
+
+export const EmptyState = memo(EmptyStateComponent);
 
 const styles = StyleSheet.create({
   container: {

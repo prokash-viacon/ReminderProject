@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Animated,
   Dimensions,
@@ -31,7 +31,7 @@ type Props = {
 
 const SHEET_HEIGHT = Math.min(Dimensions.get('window').height * 0.88, 640);
 
-export function TaskFormSheet({
+function TaskFormSheetComponent({
   visible,
   colors,
   isDark,
@@ -118,7 +118,7 @@ export function TaskFormSheet({
                 value={form.dateLabel}
                 isPlaceholder={!form.dateSet}
                 icon={strings.icons.calendar}
-                onPress={() => form.openPicker('date')}
+                onPress={form.openDatePicker}
               />
 
               <PickerField
@@ -127,7 +127,7 @@ export function TaskFormSheet({
                 value={form.timeLabel}
                 isPlaceholder={!form.timeSet}
                 icon={strings.icons.dropdown}
-                onPress={() => form.openPicker('time')}
+                onPress={form.openTimePicker}
               />
 
               {form.pickerMode &&
@@ -190,6 +190,8 @@ export function TaskFormSheet({
     </Modal>
   );
 }
+
+export const TaskFormSheet = memo(TaskFormSheetComponent);
 
 const styles = StyleSheet.create({
   modalRoot: {

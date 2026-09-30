@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { strings } from '../constants/strings';
 import { useNotificationPermissionGate } from '../hooks';
 import { typography } from '../theme/typography';
 import { AppButton } from './ui';
 
-export function NotificationPermissionModal() {
+function NotificationPermissionModalComponent() {
   const { colors, blocked, openSettings } = useNotificationPermissionGate();
 
   return (
@@ -66,6 +66,10 @@ export function NotificationPermissionModal() {
     </Modal>
   );
 }
+
+export const NotificationPermissionModal = memo(
+  NotificationPermissionModalComponent,
+);
 
 const styles = StyleSheet.create({
   backdrop: {
